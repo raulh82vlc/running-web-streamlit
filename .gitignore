@@ -1,0 +1,21 @@
+# Secrets
+.streamlit/secrets.toml
+
+# Datos limpios: solo se versionan los .enc
+data/*.csv
+
+# Temporales de la fase offline
+build/_tmp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+env_garmin/
+
+# Editor
+.vscode/*
+!.vscode/launch.json
+
+# SO
+.DS_Store

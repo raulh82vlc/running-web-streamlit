@@ -1,0 +1,4 @@
+# Dependencias para la fase offline (build/). No se despliegan.
+geopandas>=0.14
+shapely>=2.0
+pyproj>=3.6
