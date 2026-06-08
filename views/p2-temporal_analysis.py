@@ -13,8 +13,9 @@ Página del análisis del corredor con gráficas
 
 El widget en barra lateral es un filtro por años.
 
-1. Gráfico de barras funciona combinado entre filtro de años y 
-seleccionando en el button widget entre Km y VO2max
+1. Gráfico de Evolución anual (barras para Km, líneas para VO2max),
+combinado entre filtro de años y seleccionando en el button widget
+ entre Km y VO2max
 2. Gráfico de dispersión mediante filtro por años.
 3. Mapa de calor mediante el filtro por años.
 4. Gráfica de cajas mediante el filtro por años
@@ -71,8 +72,10 @@ c3.metric("Ritmo medio", f"{decimal_to_mmss(sel['pace_min_km'].mean())} min/km")
 c4.metric("FC media", f"{sel['averageHR'].mean():.0f} ppm")
 st.divider()
 
-# 1 Gráfico de barras con la Evolución anual (km o VO2max)
-st.subheader("1. Gráfico de barras: Evolución anual")
+# 1 Evolución anual (barras para Km, líneas para VO2max)
+metrica = st.session_state["temporal_metric_state"]
+tipo_grafico = "barras" if metrica == "Kilómetros" else "líneas"
+st.subheader(f"1. Gráfico de {tipo_grafico}: Evolución anual")
 metrica = st.radio(
     "Variable",
     ["Kilómetros", "VO2max"],
