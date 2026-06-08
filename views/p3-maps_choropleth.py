@@ -21,20 +21,61 @@ from lib.formatting import value_format
 
 st.title("🗺️ Mapas de coropletas temporales (año/global)")
 
+if "choropleth_scope_state" not in st.session_state:
+    st.session_state["choropleth_scope_state"] = list(SCOPES)[0]
+if "choropleth_metric_state" not in st.session_state:
+    st.session_state["choropleth_metric_state"] = METRICS[SCOPES[st.session_state["choropleth_scope_state"]]][0]
+if "choropleth_all_years_state" not in st.session_state:
+    st.session_state["choropleth_all_years_state"] = True
+
 # Widgets en la barra lateral
 with st.sidebar:
     st.header("Parámetros")
-    scope_label = st.selectbox("Ámbito", list(SCOPES))
-    scope = SCOPES[scope_label]
-    metric = st.selectbox(
-        "Métrica", METRICS[scope], format_func=lambda m: METRIC_LABELS[m]
+    scope_label = st.selectbox(
+        "Ámbito",
+        list(SCOPES),
+        index=list(SCOPES).index(st.session_state["choropleth_scope_state"]),
+        key="choropleth_scope_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "choropleth_scope_state", st.session_state["choropleth_scope_widget"]
+        ),
     )
-    all_years = st.toggle("Todos los años", value=True)
+    scope = SCOPES[scope_label]
+    if st.session_state["choropleth_metric_state"] not in METRICS[scope]:
+        st.session_state["choropleth_metric_state"] = METRICS[scope][0]
+    metric = st.selectbox(
+        "Métrica",
+        METRICS[scope],
+        format_func=lambda m: METRIC_LABELS[m],
+        index=METRICS[scope].index(st.session_state["choropleth_metric_state"]),
+        key="choropleth_metric_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "choropleth_metric_state", st.session_state["choropleth_metric_widget"]
+        ),
+    )
+    all_years = st.toggle(
+        "Todos los años",
+        value=st.session_state["choropleth_all_years_state"],
+        key="choropleth_all_years_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "choropleth_all_years_state", st.session_state["choropleth_all_years_widget"]
+        ),
+    )
     years = YEARS[scope]
     if all_years:
         year = None
     else:
-        year = st.select_slider("Año", options=years, value=years[-1])
+        if "choropleth_year_state" not in st.session_state or st.session_state["choropleth_year_state"] not in years:
+            st.session_state["choropleth_year_state"] = years[-1]
+        year = st.select_slider(
+            "Año",
+            options=years,
+            value=st.session_state["choropleth_year_state"],
+            key="choropleth_year_widget",
+            on_change=lambda: st.session_state.__setitem__(
+                "choropleth_year_state", st.session_state["choropleth_year_widget"]
+            ),
+        )
 
 metric_label = METRIC_LABELS[metric]
 periodo = "todos los años" if year is None else f"año {year}"

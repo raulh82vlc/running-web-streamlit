@@ -87,8 +87,11 @@ def load_heatmap_points():
 
 
 @st.cache_data(show_spinner=False)
-def load_track():
-    return _decrypt("track_destacada")
+def load_track(track_name: str | None = None):
+    df = _decrypt("track_destacada")
+    if "track" in df.columns and track_name is not None:
+        df = df[df["track"] == track_name].copy()
+    return df
 
 
 @st.cache_data(show_spinner=False)

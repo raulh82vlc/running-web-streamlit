@@ -95,7 +95,9 @@ with st.expander("Notas técnicas (metodología, rendimiento y seguridad)"):
   distancias con Haversine) se precomputan una sola vez; la web solo lee tablas agregadas, así
   no ejecuta ningún tipo de cálculos que requieran demasiada computación en tiempo real, y, además,
   al hacer el despliegue no necesita *geopandas*.
-- **Caché**: todo el acceso a datos usa `@st.cache_data`, para carga rápida al cambiar un widget solo recalcula lo no cacheado.
+- **Caché y estado**: todo el acceso a datos usa `@st.cache_data`, para carga rápida al cambiar un widget solo
+  recalcula lo no cacheado. El estado de filtros y selección entre páginas se conserva con
+  `st.session_state` ([docs](https://docs.streamlit.io/develop/concepts/architecture/session-state)).
 - **Privacidad**: los datos personales se sirven cifrados (Fernet/AES + PBKDF2) y se descifran
   en memoria del servidor con una clave guardada en *secrets*.
 - **Librerías**: Streamlit, Plotly (coropletas y gráficas), Folium (mapas interactivos),

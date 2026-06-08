@@ -17,7 +17,7 @@ sjoin se hace una vez y crea tablas desacopladas en data/*.csv (no encriptadas a
   - aggregations.csv -> scope, region, year, metric, value (coropletas, pag. 2)
   - running_sessions.csv -> métricas Garmin por sesión (home pag. 1, gráficas pag. 3)
   - heatmap_points.csv -> GPS submuestreado por ciudad (HeatMap pag. 4)
-  - track_destacada.csv -> traza más larga con FC (ColorLine pag. 4)
+  - track_destacada.csv -> trazas destacadas con FC (ColorLine pag. 4)
 
 siguiente paso:
   ejecutar build/encrypt_files.py para encriptar/cifrar los datos a data/*.enc.
@@ -219,21 +219,69 @@ def build_heatmap(points):
     print(f"-> heatmap_points.csv: {len(hm):,} puntos ({hm.city.value_counts().to_dict()})")
 
 
-def build_track(points, summary):
-    cands = summary[summary["hr_mean"].notna()]
-    cands = cands if not cands.empty else summary
-    fid = cands.sort_values("distance_km", ascending=False).iloc[0]["file_id"]
-    track = points[points["file_id"] == fid].sort_values("timestamp")
-    track = track.dropna(subset=["latitude", "longitude"])[["latitude", "longitude", "hr"]]
-    track.to_csv(DATA / "track_destacada.csv", index=False)
-    print(f"-> track_destacada.csv: actividad {fid}, {len(track):,} puntos")
+def build_track_variant(points, track_name, bbox):
+    """Construye una traza destacada recortada para un ámbito geográfico"""
+    in_bbox = filter_bbox(points, bbox)
+    in_bbox = in_bbox.dropna(subset=["latitude", "longitude", "hr"])
+    if in_bbox.empty:
+        print(f"-> track_destacada[{track_name}]: sin puntos en el bbox")
+        return None
+
+    activity_bbox_distance = in_bbox.groupby("file_id")["seg_km"].sum().rename("bbox_distance_km")
+    activity_points = in_bbox.groupby("file_id").size().rename("bbox_points")
+    cands = pd.concat([activity_bbox_distance, activity_points], axis=1).reset_index()
+    cands = cands.sort_values(["bbox_distance_km", "bbox_points"], ascending=[False, False])
+
+    global_distance = points.groupby("file_id")["seg_km"].sum().rename("global_distance_km")
+    global_rank = global_distance.sort_values(ascending=False)
+    global_fid = global_rank.index[0]
+    global_max_distance = float(global_rank.iloc[0])
+
+    fid = cands.iloc[0]["file_id"]
+    selected_bbox_distance = float(cands.iloc[0]["bbox_distance_km"])
+    selected_global_distance = float(global_distance.loc[fid]) if fid in global_distance.index else selected_bbox_distance
+    selected_bbox_points = int(cands.iloc[0]["bbox_points"])
+
+    track = in_bbox[in_bbox["file_id"] == fid].sort_values("timestamp")[["latitude", "longitude", "hr"]].copy()
+    track["track"] = track_name
+    track["track_scope"] = track_name
+    track["track_file_id"] = str(fid)
+    track["track_distance_km"] = round(selected_global_distance, 3)
+    track["track_bbox_distance_km"] = round(selected_bbox_distance, 3)
+    track["track_bbox_points"] = selected_bbox_points
+    
+    print(
+        f"-> track_destacada[{track_name}]: actividad {fid}, {len(track):,} puntos, "
+        f"{selected_global_distance:.3f} km totales, {selected_bbox_distance:.3f} km en el ámbito"
+    )
+    return track
+
+
+def build_track(points):
+    variants = [
+        ("Valencia", BBOX_VALENCIA),
+        ("London", BBOX_LONDON),
+        ("Trebujena", BBOX_CADIZ),
+    ]
+    tracks = []
+    for name, bbox in variants:
+        track = build_track_variant(points, name, bbox)
+        if track is not None and not track.empty:
+            tracks.append(track)
+
+    if not tracks:
+        print("-> track_destacada.csv: sin variantes generadas")
+        return
+
+    out = pd.concat(tracks, ignore_index=True)
+    out.to_csv(DATA / "track_destacada.csv", index=False)
+    print(f"-> track_destacada.csv: {len(out):,} puntos totales en {len(tracks)} variantes")
 
 def main():
     print("Cargando puntos GPS...")
     points = pd.read_csv(POINTS_CSV)
     points["timestamp"] = pd.to_datetime(points["timestamp"], errors="coerce", utc=True)
     points = points.dropna(subset=["latitude", "longitude"])
-    summary = pd.read_csv(SUMMARY_CSV)
 
     print("Calculando km entre puntos consecutivos (Haversine)...")
     points = add_segment_km(points)
@@ -262,7 +310,7 @@ def main():
     print("Generando CSVs...")
     build_sessions()
     build_heatmap(points)
-    build_track(points, summary)
+    build_track(points)
 
     print("\npreparar los datos encriptados:  python build/encrypt_files.py")
 

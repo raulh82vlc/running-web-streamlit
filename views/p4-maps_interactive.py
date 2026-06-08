@@ -17,6 +17,11 @@ from lib.charts import heatmap_map, track_map
 
 st.title("🌍 Mapas interactivos (Folium)")
 
+if "heatmap_cities_state" not in st.session_state:
+    st.session_state["heatmap_cities_state"] = []
+if "track_variant_state" not in st.session_state:
+    st.session_state["track_variant_state"] = "Valencia"
+
 # 1 Mapa de calor multiciudad
 st.subheader("Mapa de calor de las trazas GPS")
 pts = load_heatmap_points()
@@ -25,7 +30,17 @@ todas = sorted(pts["city"].unique())
 # Widgets interactivos en sidebar
 with st.sidebar:
     st.write("**Filtros - Mapa de calor**")
-    cities = st.multiselect("Ciudades", todas, default=todas, key="heatmap_cities")
+    if not st.session_state["heatmap_cities_state"]:
+        st.session_state["heatmap_cities_state"] = todas
+    cities = st.multiselect(
+        "Ciudades",
+        todas,
+        default=st.session_state["heatmap_cities_state"],
+        key="heatmap_cities_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "heatmap_cities_state", st.session_state["heatmap_cities_widget"]
+        ),
+    )
 
 if cities:
     filtered_pts = pts[pts["city"].isin(cities)]
@@ -61,7 +76,21 @@ st.markdown(
     "FC instantánea (🟢 verde = baja, 🔴 rojo = alta)."
 )
 
-track = load_track()
+with st.sidebar:
+    st.write("**Filtros - Traza destacada**")
+    track_options = ["Valencia", "London", "Trebujena"]
+    if st.session_state["track_variant_state"] not in track_options:
+        st.session_state["track_variant_state"] = track_options[0]
+    track_label = st.selectbox(
+        "Ciudad", track_options,
+        index=track_options.index(st.session_state["track_variant_state"]),
+        key="track_variant_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "track_variant_state", st.session_state["track_variant_widget"]
+        ),
+    )
+
+track = load_track(track_label)
 if track is not None:
     # Estadísticas de la traza
     col1, col2, col3, col4 = st.columns(4)
@@ -72,9 +101,10 @@ if track is not None:
             hr_mean = track["hr"].mean()
             st.metric("FC media (ppm)", f"{int(hr_mean)}")
     with col3:
-        st.metric("Latitud media", f"{track['latitude'].mean():.3f}°")
-    with col4:
-        st.metric("Longitud media", f"{track['longitude'].mean():.3f}°")
+        if "track_distance_km" in track.columns:
+            st.metric("Distancia total", f"{track['track_distance_km'].iloc[0]:.2f} km")
+        else:
+            st.metric("Latitud media", f"{track['latitude'].mean():.3f}°")
 
     # Mapa interactivo
     st_folium(track_map(track), height=520, use_container_width=True,

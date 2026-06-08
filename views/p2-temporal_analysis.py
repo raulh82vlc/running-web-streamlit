@@ -41,9 +41,23 @@ st.title("📈 Análisis temporal y rendimiento del corredor")
 df = load_sessions()
 yr_min, yr_max = int(df["year"].min()), int(df["year"].max())
 
+if "temporal_year_range_state" not in st.session_state:
+    st.session_state["temporal_year_range_state"] = (max(yr_min, 2019), yr_max)
+if "temporal_metric_state" not in st.session_state:
+    st.session_state["temporal_metric_state"] = "Kilómetros"
+
 with st.sidebar:
     st.header("Filtros")
-    rango = st.slider("Rango de años", yr_min, yr_max, (max(yr_min, 2019), yr_max))
+    rango = st.slider(
+        "Rango de años",
+        yr_min,
+        yr_max,
+        value=st.session_state["temporal_year_range_state"],
+        key="temporal_year_range_widget",
+        on_change=lambda: st.session_state.__setitem__(
+            "temporal_year_range_state", st.session_state["temporal_year_range_widget"]
+        ),
+    )
 
 sel = df[df["year"].between(*rango)].copy()
 
@@ -59,7 +73,16 @@ st.divider()
 
 # 1 Gráfico de barras con la Evolución anual (km o VO2max)
 st.subheader("1. Gráfico de barras: Evolución anual")
-metrica = st.radio("Variable", ["Kilómetros", "VO2max"], horizontal=True)
+metrica = st.radio(
+    "Variable",
+    ["Kilómetros", "VO2max"],
+    horizontal=True,
+    index=["Kilómetros", "VO2max"].index(st.session_state["temporal_metric_state"]),
+    key="temporal_metric_widget",
+    on_change=lambda: st.session_state.__setitem__(
+        "temporal_metric_state", st.session_state["temporal_metric_widget"]
+    ),
+)
 if metrica == "Kilómetros":
     anual = sel.groupby("year", as_index=False)["distance_km"].sum()
     fig1 = px.bar(
