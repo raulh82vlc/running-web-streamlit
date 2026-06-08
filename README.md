@@ -284,7 +284,7 @@ A continuación, se detallan las librerías empleadas, qué hacen a nivel técni
 
 ## 10. Referencias y créditos
 
-- Ejemplo del Javier Lluch, profesor de la asignatura de Visualización de Datos (mapa de coropletas en Streamlit Cloud):
+- Ejemplo de Javier Lluch, profesor de la asignatura de Visualización de Datos (mapa de coropletas en Streamlit Cloud):
   <https://github.com/jlluch/MapaPrecioCarburantes>
 - Documentación Streamlit (desarrollador): con ejemplos de `st.navigation`, `st.Page`, `st.cache_data`, etc en <https://docs.streamlit.io/develop>.
 - Documentación Plotly <https://plotly.com/python/plotly-express/>
