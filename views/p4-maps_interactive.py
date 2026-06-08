@@ -105,6 +105,11 @@ if track is not None:
             st.metric("Distancia total", f"{track['track_distance_km'].iloc[0]:.2f} km")
         else:
             st.metric("Latitud media", f"{track['latitude'].mean():.3f}°")
+    with col4:
+        if "track_date" in track.columns:
+            st.metric("Fecha de la carrera", track["track_date"].iloc[0])
+        elif "track_year" in track.columns:
+            st.metric("Año de la carrera", f"{int(track['track_year'].iloc[0])}")
 
     # Mapa interactivo
     st_folium(track_map(track), height=520, use_container_width=True,

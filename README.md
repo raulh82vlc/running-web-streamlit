@@ -74,11 +74,11 @@ Aplicación **Streamlit multipágina** que visualiza más de una década de entr
   - Puntos individuales de GPS, al hacer zoom se ven más claramente.
   - **Estadísticas expandibles por ciudad**: cantidad de puntos GPS para cada zona.
 - **Traza destacada coloreada por FC**:
-  - La actividad más larga del *dataset* dentro de cada ámbito (Valencia/Londres), trazada punto a punto.
-  - La interfaz muestra la distancia total, la distancia dentro del ámbito y si coincide con el máximo global.
+  - Selector de ciudad (Valencia/Londres/Trebujena): para cada ámbito se precalcula la actividad
+    con mayor distancia recorrida dentro de su *bounding box*, trazada punto a punto.
   - Coloreado por frecuencia cardíaca: verde (FC baja) -> rojo (FC alta).
   - Marcadores en los puntos de inicio (verde, play), fin (rojo, stop) y cada 5 km (azul, bandera) con FC en ese punto.
-  - **Métricas de la traza**: puntos GPS, FC media, coordenadas geográficas.
+  - **Métricas de la traza**: puntos GPS, FC media, distancia total y fecha de la carrera.
 - **Controles interactivos**: minimap, pantalla completa, marcadores con información cada 5km de FC.
 
 **Caso de uso:** Explorar dónde se ha corrido mayores distancias (mapa de calor más intenso). Ver correlación entre geografía y esfuerzo (FC) en un trayecto exigente, y analizar un entrenamiento específico con estadísticas en tiempo real.

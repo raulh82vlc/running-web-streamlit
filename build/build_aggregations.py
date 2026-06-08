@@ -242,16 +242,21 @@ def build_track_variant(points, track_name, bbox):
     selected_global_distance = float(global_distance.loc[fid]) if fid in global_distance.index else selected_bbox_distance
     selected_bbox_points = int(cands.iloc[0]["bbox_points"])
 
-    track = in_bbox[in_bbox["file_id"] == fid].sort_values("timestamp")[["latitude", "longitude", "hr"]].copy()
+    in_bbox_sorted = in_bbox[in_bbox["file_id"] == fid].sort_values("timestamp")
+    track_date = in_bbox_sorted["timestamp"].iloc[0]
+
+    track = in_bbox_sorted[["latitude", "longitude", "hr"]].copy()
     track["track"] = track_name
     track["track_scope"] = track_name
     track["track_file_id"] = str(fid)
     track["track_distance_km"] = round(selected_global_distance, 3)
     track["track_bbox_distance_km"] = round(selected_bbox_distance, 3)
     track["track_bbox_points"] = selected_bbox_points
-    
+    track["track_year"] = track_date.year
+    track["track_date"] = track_date.strftime("%Y-%m-%d")
+
     print(
-        f"-> track_destacada[{track_name}]: actividad {fid}, {len(track):,} puntos, "
+        f"-> track_destacada[{track_name}]: actividad {fid} ({track['track_date'].iloc[0]}), {len(track):,} puntos, "
         f"{selected_global_distance:.3f} km totales, {selected_bbox_distance:.3f} km en el ámbito"
     )
     return track

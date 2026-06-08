@@ -53,7 +53,7 @@ with col_a:
   (km, sesiones, FC, VO2max) y año; el mapa se recolorea al instante.
 - **📈 Análisis temporal** - evolución anual, relación ritmo-FC, calendario de km y
   distribución del ritmo por año, todo filtrable.
-- **🌍 Mapas interactivos** - mapa de calor multiciudad y la traza más larga coloreada por FC.
+- **🌍 Mapas interactivos** - mapa de calor multiciudad y la traza más larga por cada ciudad coloreada por FC.
 """
     )
 with col_b:
