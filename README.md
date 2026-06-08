@@ -23,7 +23,7 @@ Aplicación **Streamlit multipágina** que visualiza más de una década de entr
 
 **Caso de uso:** Se observa una vista global que responde *qué*, *por qué* y *cómo*.
 
-[*Captura de pantalla aquí*]
+![Página de inicio](screenshots/home.gif)
 
 ---
 
@@ -41,7 +41,7 @@ Aplicación **Streamlit multipágina** que visualiza más de una década de entr
 
 **Caso de uso:** Con esta vista se espera resolver preguntas como: *¿Mi ritmo ha mejorado?*, *¿Entreno más en verano o invierno?*, *¿Ha bajado mi FC con el entrenamiento?*
 
-[*Captura de pantalla aquí*]
+![Análisis temporal](screenshots/temporal_analysis.gif)
 
 ---
 
@@ -60,7 +60,7 @@ Aplicación **Streamlit multipágina** que visualiza más de una década de entr
 
 **Caso de uso:** Trata de dar respuesta a nivel geográfico a cuestiones como: *¿Dónde corro más km?*, *¿Dónde tengo FC más baja?*, *¿Cómo varían los datos año a año?*
 
-[*Captura de pantalla aquí*]
+![Mapas de coropletas](screenshots/choropleth_maps.gif)
 
 ---
 
@@ -83,7 +83,7 @@ Aplicación **Streamlit multipágina** que visualiza más de una década de entr
 
 **Caso de uso:** Explorar dónde se ha corrido mayores distancias (mapa de calor más intenso). Ver correlación entre geografía y esfuerzo (FC) en un trayecto exigente, y analizar un entrenamiento específico con estadísticas en tiempo real.
 
-[*Captura de pantalla aquí*]
+![Mapas interactivos](screenshots/interactive_maps.gif)
 
 ---
 
