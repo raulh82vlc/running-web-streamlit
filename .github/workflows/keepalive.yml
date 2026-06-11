@@ -1,0 +1,21 @@
+name: Streamlit Keep-Alive
+
+on:
+  schedule:
+    - cron: "0 */10 * * *"
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit app
+        env:
+          STREAMLIT_APP_URL: ${{ secrets.STREAMLIT_APP_URL }}
+        run: |
+          if [ -z "$STREAMLIT_APP_URL" ]; then
+            echo "Missing STREAMLIT_APP_URL secret" >&2
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --location --max-time 60 "$STREAMLIT_APP_URL" >/dev/null
