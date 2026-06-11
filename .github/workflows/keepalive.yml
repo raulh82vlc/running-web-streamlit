@@ -18,4 +18,13 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error --location --max-time 60 "$STREAMLIT_APP_URL" >/dev/null
+          status_code="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" --max-time 60 "$STREAMLIT_APP_URL")"
+
+          case "$status_code" in
+            2*|3*)
+              ;;
+            *)
+              echo "Unexpected HTTP status from keep-alive ping: $status_code" >&2
+              exit 1
+              ;;
+          esac
