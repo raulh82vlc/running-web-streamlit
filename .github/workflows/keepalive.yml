@@ -9,7 +9,13 @@ jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Streamlit app
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Wake Streamlit app
         env:
           STREAMLIT_APP_URL: ${{ secrets.STREAMLIT_APP_URL }}
         run: |
@@ -18,4 +24,21 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error --location --max-time 60 "$STREAMLIT_APP_URL" >/dev/null
+          python - <<'PY'
+          import os
+          from playwright.sync_api import sync_playwright
+
+          app_url = os.environ["STREAMLIT_APP_URL"].rstrip("/")
+
+          with sync_playwright() as playwright:
+              browser = playwright.chromium.launch(headless=True)
+              page = browser.new_page()
+              page.goto(app_url, wait_until="networkidle", timeout=60000)
+
+              wake_button = page.get_by_role("button", name="Yes, get this app back up!")
+              if wake_button.count() > 0:
+                  wake_button.click(timeout=10000)
+                  page.wait_for_timeout(5000)
+
+              browser.close()
+          PY

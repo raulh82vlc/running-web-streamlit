@@ -215,9 +215,9 @@ running-web-streamlit/
    key = "tu-contraseña"
    ```
 4. *Deploy*. En tiempo de ejecución no usa geopandas -> no hace falta `packages.txt` con dependencias de sistema.
-5. Para el *keep-alive*, crea en GitHub un secreto llamado `STREAMLIT_APP_URL` con la URL pública de la app y deja activo el workflow programado de [.github/workflows/keepalive.yml](.github/workflows/keepalive.yml).
+5. Para el *keep-alive*, crea en GitHub un secreto llamado `STREAMLIT_APP_URL` con la URL pública de la app y deja activo el workflow programado de [.github/workflows/keepalive.yml](.github/workflows/keepalive.yml). El job abre la app con un navegador headless y pulsa el botón de reactivación cuando aparece.
 
-> Nota: Streamlit Community Cloud puede suspender la app tras periodos largos sin tráfico. El workflow programado hace una petición HTTP periódica a la app para generar actividad real, también existen *workarounds* oficiales de [Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app).
+> Nota: Streamlit Community Cloud puede suspender la app tras periodos largos sin tráfico. El workflow programado abre la app con un navegador headless y pulsa el botón de reactivación cuando aparece; también existen *workarounds* oficiales de [Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app).
 
 
 ## 8. Metodología y fórmulas empleadas
